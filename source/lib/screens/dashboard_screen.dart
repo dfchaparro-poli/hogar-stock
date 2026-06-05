@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 import '../core/app_colors.dart';
 import '../models/category.dart';
@@ -264,7 +263,7 @@ class _QuickAccessButton extends StatelessWidget {
 class _DashboardFooter extends StatelessWidget {
   const _DashboardFooter();
 
-  static final Future<PackageInfo> _packageInfo = PackageInfo.fromPlatform();
+  static const _appVersion = '1.0.0';
 
   @override
   Widget build(BuildContext context) {
@@ -277,35 +276,13 @@ class _DashboardFooter extends StatelessWidget {
           top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
         ),
       ),
-      child: FutureBuilder<PackageInfo>(
-        future: _packageInfo,
-        builder: (context, snapshot) {
-          final version = snapshot.hasData ? 'v${snapshot.data!.version}' : '';
-
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Text(
-              //   'Inicio  Inventario  Alertas  Gestion',
-              //   textAlign: TextAlign.center,
-              //   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              //     color: Theme.of(context).colorScheme.onSurfaceVariant,
-              //   ),
-              // ),
-              if (version.isNotEmpty) ...[
-                const SizedBox(height: 4),
-                Text(
-                  version,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ],
-          );
-        },
+      child: Text(
+        'v$_appVersion',
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
