@@ -17,6 +17,9 @@ class HogarStockApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const seed = Color(0xFF2F80ED);
+    const surface = Color(0xFF101820);
+    const card = Color(0xFF172331);
+    const border = Color(0xFF2B3948);
 
     return MaterialApp(
       title: 'HogarStock',
@@ -25,26 +28,27 @@ class HogarStockApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: seed,
-          brightness: Brightness.light,
+          brightness: Brightness.dark,
         ),
-        scaffoldBackgroundColor: const Color(0xFFF7F9FC),
+        scaffoldBackgroundColor: surface,
         appBarTheme: const AppBarTheme(
-          centerTitle: false,
-          backgroundColor: Color(0xFFF7F9FC),
-          foregroundColor: Color(0xFF1F2937),
+          centerTitle: true,
+          backgroundColor: Color(0xFF142235),
+          foregroundColor: Color(0xFFEAF2FF),
+          elevation: 0,
         ),
         cardTheme: CardThemeData(
-          color: Colors.white,
+          color: card,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: const BorderSide(color: Color(0xFFE5E7EB)),
+            side: const BorderSide(color: border),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: card,
         ),
       ),
       home: DashboardScreen(

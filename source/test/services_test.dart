@@ -72,10 +72,10 @@ void main() {
   );
 
   test('filtra productos por categoria', () async {
-    final Mercado = await categoryService.create('Mercado');
+    final mercado = await categoryService.create('Mercado');
     final limpieza = await categoryService.create('Limpieza');
 
-    await productService.save(_product(name: 'Arroz', categoryId: Mercado.id));
+    await productService.save(_product(name: 'Arroz', categoryId: mercado.id));
     await productService.save(_product(name: 'Jabon', categoryId: limpieza.id));
 
     final filtered = productService.search(categoryId: limpieza.id);
