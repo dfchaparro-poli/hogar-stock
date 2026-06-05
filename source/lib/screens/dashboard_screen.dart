@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../core/app_colors.dart';
 import '../models/category.dart';
@@ -263,23 +264,48 @@ class _QuickAccessButton extends StatelessWidget {
 class _DashboardFooter extends StatelessWidget {
   const _DashboardFooter();
 
+  static final Future<PackageInfo> _packageInfo = PackageInfo.fromPlatform();
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainer,
         border: Border(
           top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
         ),
       ),
-      child: Text(
-        'Inicio  Inventario  Alertas  Gestion',
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
+      child: FutureBuilder<PackageInfo>(
+        future: _packageInfo,
+        builder: (context, snapshot) {
+          final version = snapshot.hasData ? 'v${snapshot.data!.version}' : '';
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Text(
+              //   'Inicio  Inventario  Alertas  Gestion',
+              //   textAlign: TextAlign.center,
+              //   style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              //     color: Theme.of(context).colorScheme.onSurfaceVariant,
+              //   ),
+              // ),
+              if (version.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  version,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ],
+          );
+        },
       ),
     );
   }
