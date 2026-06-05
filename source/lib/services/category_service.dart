@@ -90,7 +90,7 @@ class CategoryService {
     }
 
     for (final name in const [
-      'Despensa',
+      'Mercado',
       'Refrigerados',
       'Limpieza',
       'Aseo personal',

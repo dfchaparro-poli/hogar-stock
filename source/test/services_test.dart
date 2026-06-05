@@ -43,7 +43,7 @@ void main() {
   });
 
   test('crea un producto', () async {
-    final category = await categoryService.create('Despensa');
+    final category = await categoryService.create('Mercado');
     final product = await productService.save(
       _product(name: 'Arroz', categoryId: category.id),
     );
@@ -56,7 +56,7 @@ void main() {
   test(
     'actualiza cantidad al registrar duplicado por nombre y categoria',
     () async {
-      final category = await categoryService.create('Despensa');
+      final category = await categoryService.create('Mercado');
 
       await productService.save(
         _product(name: 'Arroz', categoryId: category.id, quantity: 2),
@@ -72,10 +72,10 @@ void main() {
   );
 
   test('filtra productos por categoria', () async {
-    final despensa = await categoryService.create('Despensa');
+    final Mercado = await categoryService.create('Mercado');
     final limpieza = await categoryService.create('Limpieza');
 
-    await productService.save(_product(name: 'Arroz', categoryId: despensa.id));
+    await productService.save(_product(name: 'Arroz', categoryId: Mercado.id));
     await productService.save(_product(name: 'Jabon', categoryId: limpieza.id));
 
     final filtered = productService.search(categoryId: limpieza.id);
@@ -85,7 +85,7 @@ void main() {
   });
 
   test('detecta productos proximos a vencer en 15 dias', () async {
-    final category = await categoryService.create('Despensa');
+    final category = await categoryService.create('Mercado');
 
     await productService.save(
       _product(
@@ -109,7 +109,7 @@ void main() {
   });
 
   test('detecta productos por reponer', () async {
-    final category = await categoryService.create('Despensa');
+    final category = await categoryService.create('Mercado');
 
     await productService.save(
       _product(
@@ -135,7 +135,7 @@ void main() {
   });
 
   test('bloquea eliminar categoria con productos asociados', () async {
-    final category = await categoryService.create('Despensa');
+    final category = await categoryService.create('Mercado');
     await productService.save(_product(name: 'Arroz', categoryId: category.id));
 
     final result = await categoryService.delete(category.id);
