@@ -9,6 +9,10 @@ El proyecto no usa backend, autenticacion, Firebase, SQLite, APIs externas ni
 sincronizacion en la nube. Esta pensado como una entrega universitaria con una
 arquitectura sencilla y facil de explicar.
 
+## Sitio Web
+
+https://dfchaparro-poli.github.io/hogar-stock/
+
 ## Requisitos
 
 - Ubuntu Desktop o una distribucion Linux compatible.
@@ -66,6 +70,17 @@ cd source
 
 Este script limpia los artefactos de build y elimina APKs generados en
 `release`.
+
+## Website
+
+El sitio estatico de presentacion vive en `website/` y esta preparado para
+GitHub Pages. Usa HTML, CSS y JavaScript puro.
+
+- Agrega capturas de la app en `website/captures/`.
+- Publica la ultima APK en `release/`.
+- El workflow `.github/workflows/deploy-website.yml` genera automaticamente los
+  manifiestos `website/data/captures.json` y
+  `website/data/website-data.json` al desplegar.
 
 ## Estructura Del Proyecto
 
