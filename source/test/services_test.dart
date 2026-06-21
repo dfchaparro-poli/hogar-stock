@@ -52,14 +52,28 @@ void main() {
     );
 
     expect(product.id, isNotEmpty);
+    expect(category.iconKey, 'market');
     expect(productService.getAll(), hasLength(1));
     expect(productService.getById(product.id)?.name, 'Arroz');
+  });
+
+  test('crea y actualiza categoria con icono', () async {
+    final category = await categoryService.create('Mascotas', iconKey: 'pets');
+
+    expect(category.iconKey, 'pets');
+
+    await categoryService.update(category.copyWith(iconKey: 'home'));
+
+    expect(categoryService.getById(category.id)?.iconKey, 'home');
   });
 
   test(
     'actualiza cantidad al registrar duplicado por nombre y categoria',
     () async {
-      final category = await categoryService.create('Mercado');
+      final category = await categoryService.create(
+        'Mercado',
+        iconKey: 'market',
+      );
 
       await productService.save(
         _product(name: 'Arroz', categoryId: category.id, quantity: 2),
@@ -193,6 +207,7 @@ void main() {
       expect(products.single['imagePath'], '/tmp/arroz.jpg');
       expect(products.single['observaciones'], 'Bolsa sellada');
       expect(categories, hasLength(1));
+      expect(categories.single['iconKey'], 'market');
     },
   );
 
@@ -208,7 +223,7 @@ void main() {
   "version": "1.1.0",
   "exportedAt": "2026-06-18T00:00:00",
   "categories": [
-    {"id": "cat-mercado", "nombre": "Mercado"}
+    {"id": "cat-mercado", "nombre": "Mercado", "iconKey": "market"}
   ],
   "products": [
     {
@@ -233,6 +248,7 @@ void main() {
     expect(result.categoriesImported, 1);
     expect(result.productsImported, 1);
     expect(category, isNotNull);
+    expect(category?.iconKey, 'market');
     expect(product, isNotNull);
     expect(product?.categoryId, category?.id);
     expect(product?.quantity, 3);

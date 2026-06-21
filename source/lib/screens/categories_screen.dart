@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../core/category_icon_catalog.dart';
 import '../models/category.dart';
 import '../models/product.dart';
 import '../services/category_service.dart';
@@ -130,59 +131,13 @@ class CategoriesScreen extends StatelessWidget {
     BuildContext context, {
     Category? category,
   }) async {
-    final controller = TextEditingController(text: category?.name ?? '');
-    final formKey = GlobalKey<FormState>();
-    final isEditing = category != null;
-
     await showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(isEditing ? 'Editar categoria' : 'Crear categoria'),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: controller,
-            autofocus: true,
-            decoration: const InputDecoration(labelText: 'Nombre'),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Campo obligatorio.';
-              }
-              return null;
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton.icon(
-            onPressed: () async {
-              if (!formKey.currentState!.validate()) {
-                return;
-              }
-
-              if (isEditing) {
-                await categoryService.update(
-                  category.copyWith(name: controller.text.trim()),
-                );
-              } else {
-                await categoryService.create(controller.text.trim());
-              }
-
-              if (context.mounted) {
-                Navigator.of(context).pop();
-              }
-            },
-            icon: const Icon(Icons.save_outlined),
-            label: const Text('Guardar'),
-          ),
-        ],
+      builder: (context) => _CategoryFormDialog(
+        category: category,
+        categoryService: categoryService,
       ),
     );
-
-    controller.dispose();
   }
 
   Future<void> _confirmDelete(
@@ -223,6 +178,141 @@ class CategoriesScreen extends StatelessWidget {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(result.message)));
+    }
+  }
+}
+
+class _CategoryFormDialog extends StatefulWidget {
+  const _CategoryFormDialog({
+    required this.category,
+    required this.categoryService,
+  });
+
+  final Category? category;
+  final CategoryService categoryService;
+
+  @override
+  State<_CategoryFormDialog> createState() => _CategoryFormDialogState();
+}
+
+class _CategoryFormDialogState extends State<_CategoryFormDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _controller;
+  late String _selectedIconKey;
+
+  bool get _isEditing => widget.category != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final category = widget.category;
+    _controller = TextEditingController(text: category?.name ?? '');
+    _selectedIconKey =
+        CategoryIconCatalog.normalizeKey(category?.iconKey) ??
+        CategoryIconCatalog.suggestedKeyForName(category?.name ?? '');
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(_isEditing ? 'Editar categoria' : 'Crear categoria'),
+      content: SizedBox(
+        width: 420,
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _controller,
+                  autofocus: true,
+                  decoration: const InputDecoration(labelText: 'Nombre'),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Campo obligatorio.';
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    if (!_isEditing) {
+                      setState(
+                        () => _selectedIconKey =
+                            CategoryIconCatalog.suggestedKeyForName(value),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Icono',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: CategoryIconCatalog.options.map((option) {
+                    final selected = _selectedIconKey == option.key;
+                    return ChoiceChip(
+                      selected: selected,
+                      avatar: Icon(option.icon, size: 18),
+                      label: Text(option.label),
+                      onSelected: (_) =>
+                          setState(() => _selectedIconKey = option.key),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton.icon(
+          onPressed: _save,
+          icon: const Icon(Icons.save_outlined),
+          label: const Text('Guardar'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final category = widget.category;
+    if (category != null) {
+      await widget.categoryService.update(
+        category.copyWith(
+          name: _controller.text.trim(),
+          iconKey: _selectedIconKey,
+        ),
+      );
+    } else {
+      await widget.categoryService.create(
+        _controller.text.trim(),
+        iconKey: _selectedIconKey,
+      );
+    }
+
+    if (mounted) {
+      Navigator.of(context).pop();
     }
   }
 }
@@ -278,6 +368,12 @@ class _CategoryRow extends StatelessWidget {
           padding: const EdgeInsets.only(left: 14, right: 4),
           child: Row(
             children: [
+              Icon(
+                CategoryIconCatalog.iconFor(category),
+                size: 20,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   category.name,

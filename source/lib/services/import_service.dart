@@ -44,7 +44,10 @@ class ImportService {
         if (name == null) {
           continue;
         }
-        final category = await categoryService.create(name);
+        final category = await categoryService.create(
+          name,
+          iconKey: _stringValue(item['iconKey']),
+        );
         categoriesImported++;
         final sourceId = _stringValue(item['id']);
         if (sourceId != null) {
@@ -66,6 +69,7 @@ class ImportService {
 
       final category = await categoryService.create(
         _stringValue(item['categoria'] ?? item['category']) ?? 'Mercado',
+        iconKey: _stringValue(item['categoryIconKey'] ?? item['iconKey']),
       );
       final sourceCategoryId = _stringValue(
         item['categoriaId'] ?? item['categoryId'],

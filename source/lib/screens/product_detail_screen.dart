@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 
+import '../core/category_icon_catalog.dart';
 import '../models/product.dart';
 import '../screens/product_form_screen.dart';
 import '../services/category_service.dart';
@@ -86,9 +87,20 @@ class ProductDetailScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       _DetailRow(label: 'Nombre', value: product.name),
-                      _DetailRow(
+                      _DetailWidgetRow(
                         label: 'Categoria',
-                        value: category?.name ?? 'Sin categoria',
+                        child: Row(
+                          children: [
+                            Icon(
+                              CategoryIconCatalog.iconFor(category),
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(category?.name ?? 'Sin categoria'),
+                            ),
+                          ],
+                        ),
                       ),
                       _DetailRow(
                         label: 'Cantidad',
@@ -185,6 +197,35 @@ class _DetailRow extends StatelessWidget {
             ),
           ),
           Expanded(child: Text(value)),
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailWidgetRow extends StatelessWidget {
+  const _DetailWidgetRow({required this.label, required this.child});
+
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 130,
+            child: Text(
+              label,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ),
+          Expanded(child: child),
         ],
       ),
     );

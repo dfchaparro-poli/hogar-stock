@@ -62,7 +62,11 @@ class ExportPayload {
   }
 
   Map<String, dynamic> _categoryToJson(Category category) {
-    return {'id': category.id, 'nombre': category.name};
+    return {
+      'id': category.id,
+      'nombre': category.name,
+      'iconKey': category.iconKey,
+    };
   }
 
   String fileStamp() {

@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
+import '../core/category_icon_catalog.dart';
 import '../models/category.dart';
 import '../models/product.dart';
 import 'hive_service.dart';
@@ -37,14 +38,26 @@ class CategoryService {
     return _categoryBox.get(id);
   }
 
-  Future<Category> create(String name) async {
+  Future<Category> create(String name, {String? iconKey}) async {
     final normalizedName = name.trim();
     final existing = findByName(normalizedName);
     if (existing != null) {
+      final normalizedIcon = CategoryIconCatalog.normalizeKey(iconKey);
+      if (normalizedIcon != null && existing.iconKey != normalizedIcon) {
+        final updated = existing.copyWith(iconKey: normalizedIcon);
+        await _categoryBox.put(updated.id, updated);
+        return updated;
+      }
       return existing;
     }
 
-    final category = Category(id: _uuid.v4(), name: normalizedName);
+    final category = Category(
+      id: _uuid.v4(),
+      name: normalizedName,
+      iconKey:
+          CategoryIconCatalog.normalizeKey(iconKey) ??
+          CategoryIconCatalog.suggestedKeyForName(normalizedName),
+    );
     await _categoryBox.put(category.id, category);
     return category;
   }
@@ -52,7 +65,12 @@ class CategoryService {
   Future<void> update(Category category) async {
     await _categoryBox.put(
       category.id,
-      category.copyWith(name: category.name.trim()),
+      category.copyWith(
+        name: category.name.trim(),
+        iconKey:
+            CategoryIconCatalog.normalizeKey(category.iconKey) ??
+            CategoryIconCatalog.suggestedKeyForName(category.name),
+      ),
     );
   }
 
@@ -89,14 +107,14 @@ class CategoryService {
       return;
     }
 
-    for (final name in const [
-      'Mercado',
-      'Refrigerados',
-      'Limpieza',
-      'Aseo personal',
-      'Medicamentos',
+    for (final entry in const [
+      ('Mercado', 'market'),
+      ('Refrigerados', 'cold'),
+      ('Limpieza', 'cleaning'),
+      ('Aseo personal', 'personal_care'),
+      ('Medicamentos', 'medicine'),
     ]) {
-      await create(name);
+      await create(entry.$1, iconKey: entry.$2);
     }
   }
 }

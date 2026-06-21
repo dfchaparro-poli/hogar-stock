@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import '../core/category_icon_catalog.dart';
 import '../models/product.dart';
 import '../services/category_service.dart';
 import '../services/product_image_service.dart';
@@ -112,7 +113,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   .map(
                     (category) => DropdownMenuItem(
                       value: category.id,
-                      child: Text(category.name),
+                      child: Row(
+                        children: [
+                          Icon(CategoryIconCatalog.iconFor(category), size: 18),
+                          const SizedBox(width: 8),
+                          Text(category.name),
+                        ],
+                      ),
                     ),
                   )
                   .toList(),

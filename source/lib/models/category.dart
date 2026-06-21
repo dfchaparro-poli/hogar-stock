@@ -1,13 +1,18 @@
 import 'package:hive/hive.dart';
 
 class Category {
-  Category({required this.id, required this.name});
+  Category({required this.id, required this.name, this.iconKey});
 
   final String id;
   final String name;
+  final String? iconKey;
 
-  Category copyWith({String? id, String? name}) {
-    return Category(id: id ?? this.id, name: name ?? this.name);
+  Category copyWith({String? id, String? name, String? iconKey}) {
+    return Category(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      iconKey: iconKey ?? this.iconKey,
+    );
   }
 }
 
@@ -23,16 +28,22 @@ class CategoryAdapter extends TypeAdapter<Category> {
       fields[reader.readByte()] = reader.read();
     }
 
-    return Category(id: fields[0] as String, name: fields[1] as String);
+    return Category(
+      id: fields[0] as String,
+      name: fields[1] as String,
+      iconKey: fields[2] as String?,
+    );
   }
 
   @override
   void write(BinaryWriter writer, Category obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.name);
+      ..write(obj.name)
+      ..writeByte(2)
+      ..write(obj.iconKey);
   }
 }

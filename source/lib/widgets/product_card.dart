@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../core/app_colors.dart';
+import '../core/category_icon_catalog.dart';
 import '../models/category.dart';
 import '../models/product.dart';
 import 'product_image.dart';
@@ -38,8 +39,18 @@ class ProductCard extends StatelessWidget {
           enablePreview: false,
         ),
         title: Text(product.name),
-        subtitle: Text(
-          '${category?.name ?? 'Sin categoria'} - Vence: $expirationText',
+        subtitle: Row(
+          children: [
+            Icon(CategoryIconCatalog.iconFor(category), size: 15),
+            const SizedBox(width: 5),
+            Expanded(
+              child: Text(
+                '${category?.name ?? 'Sin categoria'} - Vence: $expirationText',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
