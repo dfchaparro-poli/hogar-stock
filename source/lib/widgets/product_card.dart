@@ -25,6 +25,8 @@ class ProductCard extends StatelessWidget {
         ? 'Sin vencimiento'
         : DateFormat('dd/MM/yyyy').format(product.expirationDate!);
     final isLowStock = product.quantity <= product.minimumQuantity;
+    final isExpired = _isExpired(product);
+    final expirationLabel = isExpired ? 'Venció' : 'Vence';
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -38,14 +40,47 @@ class ProductCard extends StatelessWidget {
           iconSize: 22,
           enablePreview: false,
         ),
-        title: Text(product.name),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                product.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (isExpired) ...[
+              const SizedBox(width: 8),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.error.withAlpha(34),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: AppColors.error.withAlpha(120)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  child: Text(
+                    'Vencido',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: AppColors.error,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
         subtitle: Row(
           children: [
             Icon(CategoryIconCatalog.iconFor(category), size: 15),
             const SizedBox(width: 5),
             Expanded(
               child: Text(
-                '${category?.name ?? 'Sin categoria'} - Vence: $expirationText',
+                '${category?.name ?? 'Sin categoria'} - $expirationLabel: $expirationText',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -68,5 +103,16 @@ class ProductCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  bool _isExpired(Product product) {
+    final expiration = product.expirationDate;
+    if (expiration == null) {
+      return false;
+    }
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final date = DateTime(expiration.year, expiration.month, expiration.day);
+    return date.isBefore(today);
   }
 }

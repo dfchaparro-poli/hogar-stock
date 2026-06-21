@@ -106,6 +106,13 @@ void main() {
 
     await productService.save(
       _product(
+        name: 'Yogur',
+        categoryId: category.id,
+        expirationDate: DateTime(2026, 6, 4),
+      ),
+    );
+    await productService.save(
+      _product(
         name: 'Leche',
         categoryId: category.id,
         expirationDate: DateTime(2026, 6, 20),
@@ -142,6 +149,56 @@ void main() {
         categoryId: category.id,
         quantity: 5,
         minimumQuantity: 2,
+      ),
+    );
+
+    final lowStock = productService.lowStock();
+
+    expect(lowStock, hasLength(1));
+    expect(lowStock.single.name, 'Cafe');
+  });
+
+  test(
+    'incluye productos vencidos por reponer aunque tengan stock suficiente',
+    () async {
+      final category = await categoryService.create('Mercado');
+
+      await productService.save(
+        _product(
+          name: 'Panela',
+          categoryId: category.id,
+          quantity: 5,
+          minimumQuantity: 2,
+          expirationDate: DateTime(2026, 6, 4),
+        ),
+      );
+      await productService.save(
+        _product(
+          name: 'Sal',
+          categoryId: category.id,
+          quantity: 5,
+          minimumQuantity: 2,
+          expirationDate: DateTime(2026, 6, 5),
+        ),
+      );
+
+      final lowStock = productService.lowStock();
+
+      expect(lowStock, hasLength(1));
+      expect(lowStock.single.name, 'Panela');
+    },
+  );
+
+  test('no duplica productos vencidos con stock bajo', () async {
+    final category = await categoryService.create('Mercado');
+
+    await productService.save(
+      _product(
+        name: 'Cafe',
+        categoryId: category.id,
+        quantity: 1,
+        minimumQuantity: 2,
+        expirationDate: DateTime(2026, 6, 4),
       ),
     );
 

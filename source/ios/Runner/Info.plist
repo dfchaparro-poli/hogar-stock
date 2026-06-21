@@ -28,6 +28,8 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>HogarStock necesita acceder a la galeria para adjuntar imagenes a los productos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>HogarStock necesita acceder a la camara para tomar fotos de los productos.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

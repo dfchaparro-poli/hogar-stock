@@ -208,7 +208,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       runSpacing: 8,
                       children: [
                         FilledButton.tonalIcon(
-                          onPressed: _saving ? null : _pickImage,
+                          onPressed: _saving ? null : _showImageSourcePicker,
                           icon: const Icon(Icons.photo_library_outlined),
                           label: Text(
                             _imagePath == null
@@ -264,9 +264,39 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     }
   }
 
-  Future<void> _pickImage() async {
+  Future<void> _showImageSourcePicker() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_camera_outlined),
+                title: const Text('Camara'),
+                onTap: () => Navigator.of(context).pop(ImageSource.camera),
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined),
+                title: const Text('Galeria'),
+                onTap: () => Navigator.of(context).pop(ImageSource.gallery),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (source == null) {
+      return;
+    }
+
+    await _pickImage(source);
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
     final selected = await _imagePicker.pickImage(
-      source: ImageSource.gallery,
+      source: source,
       imageQuality: 85,
       maxWidth: 1600,
     );

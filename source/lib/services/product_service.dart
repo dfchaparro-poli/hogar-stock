@@ -84,7 +84,7 @@ class ProductService {
   }
 
   List<Product> expiringSoon({int days = 15}) {
-    final today = DateTime(_now().year, _now().month, _now().day);
+    final today = _today();
     final limit = today.add(Duration(days: days));
     return getAll().where((product) {
       final expiration = product.expirationDate;
@@ -98,8 +98,25 @@ class ProductService {
 
   List<Product> lowStock() {
     return getAll()
-        .where((product) => product.quantity <= product.minimumQuantity)
+        .where(
+          (product) =>
+              product.quantity <= product.minimumQuantity || isExpired(product),
+        )
         .toList();
+  }
+
+  bool isExpired(Product product) {
+    final expiration = product.expirationDate;
+    if (expiration == null) {
+      return false;
+    }
+    final date = DateTime(expiration.year, expiration.month, expiration.day);
+    return date.isBefore(_today());
+  }
+
+  DateTime _today() {
+    final now = _now();
+    return DateTime(now.year, now.month, now.day);
   }
 
   Product? _findDuplicate({
