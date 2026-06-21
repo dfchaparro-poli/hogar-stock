@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="HogarStock es una app para gestionar el inventario del hogar con productos, categorias, imagenes, vencimientos y exportacion local."
+    />
+    <title>HogarStock | Inventario del hogar</title>
+    <link rel="icon" type="image/png" href="./img/icon.png" />
+    <link rel="apple-touch-icon" href="./img/icon.png" />
+    <link rel="stylesheet" href="./css/styles.css?v=20260621-cursor2" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#inicio" aria-label="Ir al inicio">
+        <img class="brand-mark" src="./img/icon.png" alt="" aria-hidden="true" />
+        <span>HogarStock</span>
+      </a>
+      <nav class="nav" aria-label="Secciones principales">
+        <a href="#capturas">Capturas</a>
+        <a href="#funciones">Funciones</a>
+        <a href="#downloadButton">Descarga</a>
+      </nav>
+    </header>
+
+    <main id="inicio">
+      <section class="hero">
+        <div class="hero-content">
+          <p class="eyebrow">Inventario para el hogar</p>
+          <h1>HogarStock</h1>
+          <p class="hero-copy">
+            Registra productos, controla vencimientos, revisa cantidades minimas
+            y organiza tu inventario por categorias de forma simple y clara.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-button disabled" id="downloadButton" href="#" aria-disabled="true">
+              APK no disponible
+            </a>
+            <span class="download-meta" id="downloadMeta">
+              Buscando ultima version...
+            </span>
+          </div>
+        </div>
+
+        <aside class="phone-preview" aria-label="Vista previa de HogarStock">
+          <div class="phone-shell">
+            <div class="phone-bar"></div>
+            <img
+              class="phone-screen"
+              src="./img/home.png"
+              alt="Pantalla de resumen de inventario en HogarStock"
+            />
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="capturas">
+        <div class="section-heading">
+          <p class="eyebrow">Como se ve</p>
+          <h2>Capturas de la app</h2>
+        </div>
+        <div class="carousel" data-carousel>
+          <button class="carousel-button" type="button" data-prev aria-label="Captura anterior">
+            &#8249;
+          </button>
+          <div class="carousel-stage" id="carouselStage">
+            <div class="empty-state">
+              Agrega imagenes en <code>website/captures/</code> para mostrarlas aqui.
+            </div>
+          </div>
+          <button class="carousel-button" type="button" data-next aria-label="Captura siguiente">
+            &#8250;
+          </button>
+        </div>
+        <div class="carousel-dots" id="carouselDots" aria-label="Selector de capturas"></div>
+      </section>
+
+      <section class="section features" id="funciones">
+        <div class="section-heading">
+          <p class="eyebrow">Funciones principales</p>
+          <h2>Todo tu inventario local en un solo lugar</h2>
+        </div>
+        <div class="feature-grid">
+          <article>
+            <span class="feature-icon" aria-hidden="true">+</span>
+            <h3>Productos</h3>
+            <p>Registra, edita, busca y elimina productos del hogar.</p>
+          </article>
+          <article>
+            <span class="feature-icon" aria-hidden="true">#</span>
+            <h3>Categorias</h3>
+            <p>Organiza productos por categorias con iconos claros.</p>
+          </article>
+          <article>
+            <span class="feature-icon" aria-hidden="true">!</span>
+            <h3>Alertas locales</h3>
+            <p>Consulta productos por vencer y productos por reponer.</p>
+          </article>
+          <article>
+            <span class="feature-icon" aria-hidden="true">&#8595;</span>
+            <h3>Respaldos JSON</h3>
+            <p>Importa y exporta respaldos del inventario sin nube.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>HogarStock - <span id="currentYear"></span></span>
+    </footer>
+
+    <script src="./js/app.js?v=20260621-cursor2" defer></script>
+  </body>
+</html>

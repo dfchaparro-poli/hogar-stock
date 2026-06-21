@@ -1,0 +1,102 @@
+name: Deploy Website
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - website/**
+      - release/**
+      - .github/workflows/deploy-website.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare static website
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site
+          cp -R website/. _site/
+
+          mkdir -p _site/release
+          if compgen -G "release/*.apk" > /dev/null; then
+            cp release/*.apk _site/release/
+          fi
+
+          python3 - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          site = Path("_site")
+          release = site / "release"
+
+          def version_key(path):
+              match = re.search(r"v?(\d+(?:\.\d+){0,3})(?:\+(\d+))?", path.name)
+              if not match:
+                  return ((-1,), -1, path.name)
+              parts = tuple(int(part) for part in match.group(1).split("."))
+              build = int(match.group(2) or -1)
+              return (parts, build, path.name)
+
+          apks = sorted(release.glob("*.apk"), key=version_key)
+          latest = apks[-1] if apks else None
+          data_dir = site / "data"
+          data_dir.mkdir(parents=True, exist_ok=True)
+          website_data = {
+              "apkName": latest.name if latest else None,
+              "apkUrl": f"./release/{latest.name}" if latest else None,
+              "apkSize": latest.stat().st_size if latest else None,
+          }
+          (data_dir / "website-data.json").write_text(
+              json.dumps(website_data, ensure_ascii=False, indent=2),
+              encoding="utf-8",
+          )
+
+          capture_dir = site / "captures"
+          extensions = {".png", ".jpg", ".jpeg", ".webp"}
+          captures = []
+          if capture_dir.exists():
+              for path in sorted(capture_dir.iterdir(), key=lambda item: item.name.lower()):
+                  if path.is_file() and path.suffix.lower() in extensions:
+                      name = path.stem.replace("-", " ").replace("_", " ").strip()
+                      captures.append({
+                          "src": path.relative_to(site).as_posix(),
+                          "alt": f"Captura de HogarStock - {name or path.stem}",
+                      })
+          (data_dir / "captures.json").write_text(
+              json.dumps(captures, ensure_ascii=False, indent=2),
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,11 +1,11 @@
 {
-    "name": "hogar_stock",
-    "short_name": "hogar_stock",
+    "name": "HogarStock",
+    "short_name": "HogarStock",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#101820",
+    "theme_color": "#142235",
+    "description": "Inventario para el hogar.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
