@@ -432,8 +432,26 @@ h2 {
 }
 
 @media (max-width: 820px) {
+  .topbar {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.65rem 1rem;
+    padding-block: 0.75rem;
+  }
+
+  .brand {
+    width: 100%;
+    justify-content: center;
+  }
+
   .nav {
-    display: none;
+    width: 100%;
+    justify-content: center;
+    gap: clamp(0.75rem, 4vw, 1.35rem);
+  }
+
+  .nav a {
+    font-size: clamp(0.85rem, 3.5vw, 0.95rem);
   }
 
   .hero {
@@ -447,6 +465,15 @@ h2 {
 }
 
 @media (max-width: 560px) {
+  .topbar {
+    position: static;
+  }
+
+  .brand-mark {
+    width: 2rem;
+    height: 2rem;
+  }
+
   .hero-content {
     text-align: center;
   }
