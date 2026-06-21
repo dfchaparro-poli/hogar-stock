@@ -12,8 +12,12 @@ const downloadButton = document.querySelector('#downloadButton');
 const downloadMeta = document.querySelector('#downloadMeta');
 const currentYear = document.querySelector('#currentYear');
 const downloadNavLink = document.querySelector('.nav a[href="#downloadButton"]');
+const captureModal = document.querySelector('#captureModal');
+const modalContent = captureModal?.querySelector('.modal-content');
+const modalClose = captureModal?.querySelector('.modal-close');
+const backToTopButton = document.querySelector('.back-to-top');
 const interactiveCursorSelector =
-  '.brand, .brand *, .nav a, .primary-button:not(.disabled), .carousel-button:not(:disabled), .carousel-dots button';
+  '.brand, .brand *, .nav a, .primary-button:not(.disabled), .carousel-button:not(:disabled), .carousel-dots button, .capture-open, .modal-close, .back-to-top';
 
 async function loadJson(path, fallback) {
   try {
@@ -107,6 +111,42 @@ function setupInteractiveCursorFallback() {
   });
 }
 
+function createCaptureFrame(capture, index, { interactive = true } = {}) {
+  const image = document.createElement('img');
+  image.src = capture.src;
+  image.alt = capture.alt || `Captura ${index + 1} de HogarStock`;
+  image.loading = 'lazy';
+  image.className = 'capture-phone-screen';
+
+  const screen = document.createElement(interactive ? 'button' : 'div');
+  screen.className = 'capture-open';
+  screen.append(image);
+
+  if (interactive) {
+    screen.type = 'button';
+    screen.setAttribute('aria-label', `Ampliar ${image.alt}`);
+    screen.addEventListener('click', () => openCaptureModal(capture, index));
+  }
+
+  const phoneFrame = document.createElement('div');
+  phoneFrame.className = `phone-frame capture-phone-frame ${
+    state.direction < 0 ? 'is-entering-prev' : 'is-entering-next'
+  }`;
+  const overlay = document.createElement('span');
+  overlay.className = 'phone-frame-overlay';
+  overlay.setAttribute('aria-hidden', 'true');
+
+  ['top', 'right', 'bottom', 'left'].forEach((position) => {
+    const part = document.createElement('span');
+    part.className = `phone-frame-overlay-part is-${position}`;
+    overlay.append(part);
+  });
+
+  phoneFrame.append(screen, overlay);
+
+  return phoneFrame;
+}
+
 function renderCarousel() {
   const captures = state.captures;
   prevButton.disabled = captures.length <= 1;
@@ -120,23 +160,7 @@ function renderCarousel() {
   }
 
   const capture = captures[state.current];
-  const image = document.createElement('img');
-  image.src = capture.src;
-  image.alt = capture.alt || `Captura ${state.current + 1} de HogarStock`;
-  image.loading = 'lazy';
-  image.className = 'capture-phone-screen';
-
-  const phoneBar = document.createElement('div');
-  phoneBar.className = 'capture-phone-bar';
-  phoneBar.setAttribute('aria-hidden', 'true');
-
-  const phoneShell = document.createElement('div');
-  phoneShell.className = `capture-phone-shell ${
-    state.direction < 0 ? 'is-entering-prev' : 'is-entering-next'
-  }`;
-  phoneShell.append(phoneBar, image);
-
-  stage.replaceChildren(phoneShell);
+  stage.replaceChildren(createCaptureFrame(capture, state.current));
 
   captures.forEach((_, index) => {
     const dot = document.createElement('button');
@@ -150,6 +174,29 @@ function renderCarousel() {
     });
     dots.appendChild(dot);
   });
+}
+
+function openCaptureModal(capture, index) {
+  if (!captureModal || !modalContent) {
+    return;
+  }
+
+  const frame = createCaptureFrame(capture, index, { interactive: false });
+  frame.classList.remove('is-entering-next', 'is-entering-prev');
+  modalContent.replaceChildren(frame);
+  captureModal.hidden = false;
+  document.body.classList.add('modal-open');
+  modalClose?.focus();
+}
+
+function closeCaptureModal() {
+  if (!captureModal || captureModal.hidden) {
+    return;
+  }
+
+  captureModal.hidden = true;
+  modalContent?.replaceChildren();
+  document.body.classList.remove('modal-open');
 }
 
 function moveCarousel(direction) {
@@ -171,6 +218,13 @@ async function setupCarousel() {
   prevButton.addEventListener('click', () => moveCarousel(-1));
   nextButton.addEventListener('click', () => moveCarousel(1));
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeCaptureModal();
+      return;
+    }
+    if (captureModal && !captureModal.hidden) {
+      return;
+    }
     if (event.key === 'ArrowLeft') {
       moveCarousel(-1);
     }
@@ -178,6 +232,34 @@ async function setupCarousel() {
       moveCarousel(1);
     }
   });
+
+  modalClose?.addEventListener('click', closeCaptureModal);
+  captureModal?.addEventListener('click', (event) => {
+    if (event.target === captureModal) {
+      closeCaptureModal();
+    }
+  });
+}
+
+function setupBackToTop() {
+  if (!backToTopButton) {
+    return;
+  }
+
+  const toggleButton = () => {
+    const shouldShow = window.scrollY > 360;
+    backToTopButton.hidden = false;
+    backToTopButton.classList.toggle('is-visible', shouldShow);
+    backToTopButton.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+    backToTopButton.tabIndex = shouldShow ? 0 : -1;
+  };
+
+  backToTopButton.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', toggleButton, { passive: true });
+  toggleButton();
+  window.setTimeout(toggleButton, 250);
 }
 
 setupCurrentYear();
@@ -185,3 +267,4 @@ setupInteractiveCursorFallback();
 setupDownloadNavigation();
 setupDownload();
 setupCarousel();
+setupBackToTop();

@@ -10,7 +10,7 @@
     <title>HogarStock | Inventario del hogar</title>
     <link rel="icon" type="image/png" href="./img/icon.png" />
     <link rel="apple-touch-icon" href="./img/icon.png" />
-    <link rel="stylesheet" href="./css/styles.css?v=20260621-mobile-nav" />
+    <link rel="stylesheet" href="./css/styles.css?v=20260621-captures-modal" />
   </head>
   <body>
     <header class="topbar">
@@ -45,13 +45,18 @@
         </div>
 
         <aside class="phone-preview" aria-label="Vista previa de HogarStock">
-          <div class="phone-shell">
-            <div class="phone-bar"></div>
+          <div class="phone-frame hero-phone-frame">
             <img
-              class="phone-screen"
+              class="phone-frame-screen"
               src="./img/home.png"
               alt="Pantalla de resumen de inventario en HogarStock"
             />
+            <span class="phone-frame-overlay" aria-hidden="true">
+              <span class="phone-frame-overlay-part is-top"></span>
+              <span class="phone-frame-overlay-part is-right"></span>
+              <span class="phone-frame-overlay-part is-bottom"></span>
+              <span class="phone-frame-overlay-part is-left"></span>
+            </span>
           </div>
         </aside>
       </section>
@@ -63,7 +68,7 @@
         </div>
         <div class="carousel" data-carousel>
           <button class="carousel-button" type="button" data-prev aria-label="Captura anterior">
-            &#8249;
+            <span aria-hidden="true">&#8249;</span>
           </button>
           <div class="carousel-stage" id="carouselStage">
             <div class="empty-state">
@@ -71,7 +76,7 @@
             </div>
           </div>
           <button class="carousel-button" type="button" data-next aria-label="Captura siguiente">
-            &#8250;
+            <span aria-hidden="true">&#8250;</span>
           </button>
         </div>
         <div class="carousel-dots" id="carouselDots" aria-label="Selector de capturas"></div>
@@ -111,6 +116,19 @@
       <span>HogarStock - <span id="currentYear"></span></span>
     </footer>
 
-    <script src="./js/app.js?v=20260621-cursor2" defer></script>
+    <button class="back-to-top" type="button" aria-label="Volver al inicio" hidden>
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f" aria-hidden="true">
+        <path d="M480-528 296-344l-56-56 240-240 240 240-56 56-184-184Z" />
+      </svg>
+    </button>
+
+    <div class="capture-modal" id="captureModal" role="dialog" aria-modal="true" aria-label="Captura ampliada" hidden>
+      <button class="modal-close" type="button" aria-label="Cerrar captura ampliada">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <div class="modal-content"></div>
+    </div>
+
+    <script src="./js/app.js?v=20260621-captures-modal" defer></script>
   </body>
 </html>

@@ -5,10 +5,6 @@ gestionar el inventario de productos almacenados en el hogar. Funciona
 completamente offline y guarda la informacion localmente en el dispositivo con
 Hive.
 
-El proyecto no usa backend, autenticacion, Firebase, SQLite, APIs externas ni
-sincronizacion en la nube. Esta pensado como una entrega universitaria con una
-arquitectura sencilla y facil de explicar.
-
 ## Sitio Web
 
 https://dfchaparro-poli.github.io/hogar-stock/

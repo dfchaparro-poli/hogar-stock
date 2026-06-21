@@ -34,6 +34,10 @@ body {
     sans-serif;
 }
 
+body.modal-open {
+  overflow: hidden;
+}
+
 a,
 button {
   color: inherit;
@@ -199,30 +203,73 @@ h2 {
   justify-content: center;
 }
 
-.phone-shell {
-  width: min(320px, 100%);
-  padding: 0.8rem;
-  background: #0d1520;
-  border: 1px solid var(--line);
-  border-radius: 32px;
-  box-shadow: var(--shadow);
-}
-
-.phone-bar {
-  width: 38%;
-  height: 0.35rem;
-  margin: 0.2rem auto 0.9rem;
-  border-radius: 999px;
-  background: #334155;
-}
-
-.phone-screen {
+.phone-frame {
+  --screen-top: 8.9%;
+  --screen-right: 29.6%;
+  --screen-bottom: 8.4%;
+  --screen-left: 29.3%;
+  position: relative;
+  aspect-ratio: 1;
   display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 22px;
-  background: var(--surface);
-  border: 1px solid var(--line);
+  border: 0;
+  background: url("../img/cell-phone.png") center / contain no-repeat;
+  overflow: hidden;
+  will-change: opacity, transform;
+}
+
+.hero-phone-frame {
+  width: min(420px, 100%);
+  filter: drop-shadow(0 18px 50px rgba(0, 0, 0, 0.32));
+}
+
+.phone-frame-screen,
+.capture-open {
+  position: absolute;
+  top: var(--screen-top);
+  right: var(--screen-right);
+  bottom: var(--screen-bottom);
+  left: var(--screen-left);
+  display: block;
+  border: 0;
+  border-radius: 24px;
+  background: #101820;
+  overflow: hidden;
+}
+
+.phone-frame-screen {
+  width: calc(100% - var(--screen-left) - var(--screen-right));
+  height: calc(100% - var(--screen-top) - var(--screen-bottom));
+  object-fit: cover;
+  object-position: top center;
+}
+
+.phone-frame-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.phone-frame-overlay-part {
+  position: absolute;
+  inset: 0;
+  background: url("../img/cell-phone.png") center / contain no-repeat;
+}
+
+.phone-frame-overlay-part.is-top {
+  clip-path: inset(0 0 calc(100% - var(--screen-top)) 0);
+}
+
+.phone-frame-overlay-part.is-right {
+  clip-path: inset(0 0 0 calc(100% - var(--screen-right)));
+}
+
+.phone-frame-overlay-part.is-bottom {
+  clip-path: inset(calc(100% - var(--screen-bottom)) 0 0 0);
+}
+
+.phone-frame-overlay-part.is-left {
+  clip-path: inset(0 calc(100% - var(--screen-left)) 0 0);
 }
 
 .feature-grid article {
@@ -240,10 +287,7 @@ h2 {
 }
 
 .carousel {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 1rem;
-  align-items: center;
+  position: relative;
 }
 
 .carousel-stage {
@@ -257,58 +301,81 @@ h2 {
   box-shadow: var(--shadow);
 }
 
-.capture-phone-shell {
-  width: min(300px, 86%);
-  max-height: clamp(250px, 56vw, 590px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0.75rem;
-  background: #0d1520;
-  border: 1px solid var(--line);
-  border-radius: 30px;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
-  will-change: opacity, transform;
+.capture-phone-frame {
+  width: min(500px, 86%);
 }
 
-.capture-phone-shell.is-entering-next {
+.capture-phone-frame.is-entering-next {
   animation: carousel-enter-next 280ms ease-out both;
 }
 
-.capture-phone-shell.is-entering-prev {
+.capture-phone-frame.is-entering-prev {
   animation: carousel-enter-prev 280ms ease-out both;
 }
 
-.capture-phone-bar {
-  width: 38%;
-  height: 0.34rem;
-  flex: 0 0 auto;
-  margin: 0.15rem auto 0.75rem;
-  border-radius: 999px;
-  background: #334155;
+.capture-open {
+  padding: 0;
+  cursor: zoom-in;
 }
 
 .capture-phone-screen {
   display: block;
-  width: auto;
-  max-width: 100%;
-  max-height: calc(clamp(250px, 56vw, 590px) - 2rem);
-  min-height: 0;
-  border: 1px solid var(--line);
-  border-radius: 21px;
+  width: 100%;
+  height: 100%;
   background: var(--surface);
-  object-fit: contain;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.capture-open:focus-visible,
+.carousel-button:focus-visible,
+.carousel-dots button:focus-visible,
+.back-to-top:focus-visible,
+.modal-close:focus-visible {
+  outline: 3px solid rgba(169, 198, 255, 0.8);
+  outline-offset: 3px;
 }
 
 .carousel-button {
-  width: 2.75rem;
-  height: 2.75rem;
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
   border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface-2);
+  border-radius: 999px;
+  background: rgba(20, 34, 53, 0.88);
   color: var(--text);
-  font-size: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
   cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.carousel-button[data-prev] {
+  left: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.carousel-button[data-next] {
+  right: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.carousel-button span {
+  display: block;
+  font-size: 2rem;
+  line-height: 1;
+  transform: translateY(-0.08rem);
+}
+
+.carousel-button:hover {
+  background: rgba(31, 48, 69, 0.96);
+  border-color: rgba(169, 198, 255, 0.44);
+  transform: translateY(-50%) scale(1.04);
 }
 
 .carousel-button:disabled {
@@ -337,6 +404,90 @@ h2 {
   background: var(--primary);
 }
 
+.capture-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 2rem);
+  background: rgba(6, 12, 20, 0.84);
+  backdrop-filter: blur(12px);
+}
+
+.capture-modal[hidden],
+.back-to-top[hidden] {
+  display: none;
+}
+
+.modal-content {
+  width: min(92vw, 720px);
+  max-height: min(88vh, 880px);
+  display: grid;
+  place-items: center;
+}
+
+.modal-content .capture-phone-frame {
+  width: min(88vh, 720px, 92vw);
+}
+
+.modal-content .capture-open {
+  cursor: default;
+}
+
+.modal-close,
+.back-to-top {
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(169, 198, 255, 0.3);
+  border-radius: 999px;
+  background: rgba(20, 34, 53, 0.94);
+  color: var(--text);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.32);
+}
+
+.modal-close {
+  position: fixed;
+  top: clamp(1rem, 3vw, 1.5rem);
+  right: clamp(1rem, 3vw, 1.5rem);
+  width: 2.9rem;
+  height: 2.9rem;
+  font-size: 2rem;
+}
+
+.modal-close span {
+  line-height: 1;
+  transform: translateY(-0.08rem);
+}
+
+.back-to-top {
+  position: fixed;
+  right: clamp(1rem, 4vw, 1.6rem);
+  bottom: clamp(1rem, 4vw, 1.6rem);
+  z-index: 30;
+  width: 3rem;
+  height: 3rem;
+  background: var(--primary);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(0.65rem);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    background 160ms ease;
+}
+
+.back-to-top.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.modal-close:hover,
+.back-to-top:hover {
+  background: #c4d8ff;
+}
+
 @keyframes carousel-enter-next {
   from {
     opacity: 0;
@@ -362,8 +513,8 @@ h2 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .capture-phone-shell.is-entering-next,
-  .capture-phone-shell.is-entering-prev {
+  .capture-phone-frame.is-entering-next,
+  .capture-phone-frame.is-entering-prev {
     animation: carousel-fade-in 120ms ease-out both;
   }
 
@@ -487,12 +638,21 @@ h2 {
     text-align: center;
   }
 
-  .carousel {
-    grid-template-columns: 1fr;
+  .carousel-button {
+    width: 2.7rem;
+    height: 2.7rem;
   }
 
-  .carousel-button {
-    width: 100%;
+  .carousel-button[data-prev] {
+    left: 0.55rem;
+  }
+
+  .carousel-button[data-next] {
+    right: 0.55rem;
+  }
+
+  .capture-phone-frame {
+    width: min(360px, 94%);
   }
 
   .feature-grid {
