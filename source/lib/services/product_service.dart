@@ -43,6 +43,10 @@ class ProductService {
         unit: product.unit.trim(),
         expirationDate: product.expirationDate,
         clearExpirationDate: product.expirationDate == null,
+        imagePath: product.imagePath,
+        clearImagePath: product.imagePath == null,
+        observations: product.observations,
+        clearObservations: product.observations == null,
         updatedAt: now,
       );
       await _productBox.put(updated.id, updated);
@@ -53,6 +57,7 @@ class ProductService {
       id: product.id.isEmpty ? _uuid.v4() : product.id,
       name: product.name.trim(),
       unit: product.unit.trim(),
+      observations: product.observations?.trim(),
       createdAt: product.id.isEmpty ? now : product.createdAt,
       updatedAt: now,
     );

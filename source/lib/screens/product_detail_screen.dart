@@ -7,6 +7,7 @@ import '../screens/product_form_screen.dart';
 import '../services/category_service.dart';
 import '../services/hive_service.dart';
 import '../services/product_service.dart';
+import '../widgets/product_image.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   const ProductDetailScreen({
@@ -70,6 +71,17 @@ class ProductDetailScreen extends StatelessWidget {
             children: [
               Card(
                 child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: ProductImage(
+                    imagePath: product.imagePath,
+                    height: 220,
+                    iconSize: 52,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Card(
+                child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
@@ -87,6 +99,12 @@ class ProductDetailScreen extends StatelessWidget {
                         value: '${product.minimumQuantity}',
                       ),
                       _DetailRow(label: 'Vencimiento', value: expiration),
+                      _DetailRow(
+                        label: 'Observaciones',
+                        value: product.observations?.trim().isEmpty ?? true
+                            ? 'Sin observaciones'
+                            : product.observations!,
+                      ),
                       _DetailRow(
                         label: 'Creado',
                         value: DateFormat(

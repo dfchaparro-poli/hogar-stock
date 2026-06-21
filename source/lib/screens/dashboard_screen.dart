@@ -118,6 +118,7 @@ class DashboardScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
                           _QuickAccessButton(
+                            icon: Icons.inventory_2_outlined,
                             label: 'Ver inventario',
                             onTap: () => _open(
                               context,
@@ -128,14 +129,17 @@ class DashboardScreen extends StatelessWidget {
                             ),
                           ),
                           _QuickAccessButton(
+                            icon: Icons.event_busy_outlined,
                             label: 'Productos proximos a vencer',
                             onTap: () => _open(context, _expiringScreen()),
                           ),
                           _QuickAccessButton(
+                            icon: Icons.production_quantity_limits_outlined,
                             label: 'Productos por reponer',
                             onTap: () => _open(context, _lowStockScreen()),
                           ),
                           _QuickAccessButton(
+                            icon: Icons.category_outlined,
                             label: 'Gestionar categorias',
                             onTap: () => _open(
                               context,
@@ -236,8 +240,13 @@ class _SummaryTile extends StatelessWidget {
 }
 
 class _QuickAccessButton extends StatelessWidget {
-  const _QuickAccessButton({required this.label, required this.onTap});
+  const _QuickAccessButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
+  final IconData icon;
   final String label;
   final VoidCallback onTap;
 
@@ -254,7 +263,14 @@ class _QuickAccessButton extends StatelessWidget {
           side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         ),
-        child: Text(label),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 18),
+            const SizedBox(width: 10),
+            Flexible(child: Text(label)),
+          ],
+        ),
       ),
     );
   }
@@ -263,7 +279,7 @@ class _QuickAccessButton extends StatelessWidget {
 class _DashboardFooter extends StatelessWidget {
   const _DashboardFooter();
 
-  static const _appVersion = '1.0.0';
+  static const _appVersion = '1.1.0';
 
   @override
   Widget build(BuildContext context) {

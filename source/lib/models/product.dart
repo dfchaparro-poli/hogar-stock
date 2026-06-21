@@ -11,6 +11,8 @@ class Product {
     required this.expirationDate,
     required this.createdAt,
     required this.updatedAt,
+    this.imagePath,
+    this.observations,
   });
 
   final String id;
@@ -22,6 +24,8 @@ class Product {
   final DateTime? expirationDate;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? imagePath;
+  final String? observations;
 
   Product copyWith({
     String? id,
@@ -34,6 +38,10 @@ class Product {
     bool clearExpirationDate = false,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? imagePath,
+    bool clearImagePath = false,
+    String? observations,
+    bool clearObservations = false,
   }) {
     return Product(
       id: id ?? this.id,
@@ -47,6 +55,10 @@ class Product {
           : expirationDate ?? this.expirationDate,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      imagePath: clearImagePath ? null : imagePath ?? this.imagePath,
+      observations: clearObservations
+          ? null
+          : observations ?? this.observations,
     );
   }
 }
@@ -73,13 +85,15 @@ class ProductAdapter extends TypeAdapter<Product> {
       expirationDate: fields[6] as DateTime?,
       createdAt: fields[7] as DateTime,
       updatedAt: fields[8] as DateTime,
+      imagePath: fields[9] as String?,
+      observations: fields[10] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Product obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -97,6 +111,10 @@ class ProductAdapter extends TypeAdapter<Product> {
       ..writeByte(7)
       ..write(obj.createdAt)
       ..writeByte(8)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(9)
+      ..write(obj.imagePath)
+      ..writeByte(10)
+      ..write(obj.observations);
   }
 }

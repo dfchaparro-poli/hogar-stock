@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../models/product.dart';
 import '../services/category_service.dart';
+import '../services/product_image_service.dart';
 import '../services/product_service.dart';
+import '../widgets/product_image.dart';
 
 class ProductFormScreen extends StatefulWidget {
   const ProductFormScreen({
@@ -27,9 +30,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   final _quantityController = TextEditingController();
   final _minimumQuantityController = TextEditingController();
   final _unitController = TextEditingController();
+  final _observationsController = TextEditingController();
+  final _imagePicker = ImagePicker();
+  final _imageService = ProductImageService();
 
   DateTime? _expirationDate;
   String? _categoryId;
+  String? _imagePath;
   bool _saving = false;
 
   bool get _isEditing => widget.product != null;
@@ -39,8 +46,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     super.initState();
     final product = widget.product;
     final categories = widget.categoryService.getAll();
+    final defaultCategory = widget.categoryService.findByName('Mercado');
     _categoryId =
         product?.categoryId ??
+        defaultCategory?.id ??
         (categories.isEmpty ? null : categories.first.id);
 
     if (product != null) {
@@ -48,7 +57,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _quantityController.text = product.quantity.toString();
       _minimumQuantityController.text = product.minimumQuantity.toString();
       _unitController.text = product.unit;
+      _observationsController.text = product.observations ?? '';
       _expirationDate = product.expirationDate;
+      _imagePath = product.imagePath;
     } else {
       _minimumQuantityController.text = '1';
       _unitController.text = 'unidades';
@@ -61,6 +72,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     _quantityController.dispose();
     _minimumQuantityController.dispose();
     _unitController.dispose();
+    _observationsController.dispose();
     super.dispose();
   }
 
@@ -139,6 +151,16 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               validator: _required,
             ),
             const SizedBox(height: 12),
+            TextFormField(
+              controller: _observationsController,
+              decoration: const InputDecoration(
+                labelText: 'Observaciones',
+                prefixIcon: Icon(Icons.notes_outlined),
+              ),
+              minLines: 2,
+              maxLines: 3,
+            ),
+            const SizedBox(height: 12),
             Card(
               margin: EdgeInsets.zero,
               child: ListTile(
@@ -153,6 +175,55 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         icon: const Icon(Icons.close),
                       ),
                 onTap: _pickDate,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              margin: EdgeInsets.zero,
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Imagen del producto',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ProductImage(
+                      imagePath: _imagePath,
+                      height: 180,
+                      iconSize: 42,
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 10,
+                      runSpacing: 8,
+                      children: [
+                        FilledButton.tonalIcon(
+                          onPressed: _saving ? null : _pickImage,
+                          icon: const Icon(Icons.photo_library_outlined),
+                          label: Text(
+                            _imagePath == null
+                                ? 'Seleccionar imagen'
+                                : 'Cambiar imagen',
+                          ),
+                        ),
+                        if (_imagePath != null)
+                          TextButton.icon(
+                            onPressed: _saving
+                                ? null
+                                : () => setState(() => _imagePath = null),
+                            icon: const Icon(Icons.close),
+                            label: const Text('Quitar'),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -189,6 +260,29 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final selected = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+      maxWidth: 1600,
+    );
+
+    if (selected == null) {
+      return;
+    }
+
+    try {
+      final savedPath = await _imageService.saveImage(selected);
+      if (mounted) {
+        setState(() => _imagePath = savedPath);
+      }
+    } catch (_) {
+      if (mounted) {
+        _showMessage('No se pudo seleccionar la imagen.');
+      }
+    }
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -207,6 +301,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       expirationDate: _expirationDate,
       createdAt: existing?.createdAt ?? now,
       updatedAt: existing?.updatedAt ?? now,
+      imagePath: _imagePath?.trim().isEmpty ?? true ? null : _imagePath,
+      observations: _observationsController.text.trim().isEmpty
+          ? null
+          : _observationsController.text.trim(),
     );
 
     await widget.productService.save(product);
@@ -226,6 +324,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       ),
     );
     Navigator.of(context).pop();
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   String? _required(String? value) {

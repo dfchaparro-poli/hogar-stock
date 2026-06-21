@@ -105,6 +105,8 @@ source/
 - Gestionar categorias.
 - Consultar productos proximos a vencer en los proximos 15 dias.
 - Consultar productos por reponer.
+- Adjuntar imagenes a productos desde la galeria del dispositivo.
+- Exportar e importar el inventario completo en formato JSON desde el dispositivo.
 - Persistencia local con Hive.
 - Estados vacios y mensajes para busquedas sin resultados.
 - Confirmaciones antes de eliminar productos o categorias.

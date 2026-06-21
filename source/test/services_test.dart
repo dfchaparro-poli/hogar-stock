@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:hogar_stock/models/category.dart';
 import 'package:hogar_stock/models/product.dart';
 import 'package:hogar_stock/services/category_service.dart';
+import 'package:hogar_stock/services/export_service.dart';
+import 'package:hogar_stock/services/import_service.dart';
 import 'package:hogar_stock/services/product_service.dart';
 
 void main() {
@@ -143,6 +146,100 @@ void main() {
     expect(result.deleted, isFalse);
     expect(categoryService.getById(category.id), isNotNull);
   });
+
+  test('conserva la ruta de imagen del producto', () async {
+    final category = await categoryService.create('Mercado');
+    final product = await productService.save(
+      _product(
+        name: 'Arroz',
+        categoryId: category.id,
+        imagePath: '/tmp/arroz.jpg',
+      ),
+    );
+
+    expect(product.imagePath, '/tmp/arroz.jpg');
+    expect(productService.getById(product.id)?.imagePath, '/tmp/arroz.jpg');
+  });
+
+  test(
+    'genera JSON de exportacion con productos, categorias e imagen',
+    () async {
+      final category = await categoryService.create('Mercado');
+      await productService.save(
+        _product(
+          name: 'Arroz',
+          categoryId: category.id,
+          imagePath: '/tmp/arroz.jpg',
+          observations: 'Bolsa sellada',
+        ),
+      );
+      final exportService = ExportService(
+        productService: productService,
+        categoryService: categoryService,
+        now: () => DateTime(2026, 6, 18),
+      );
+
+      final payload =
+          jsonDecode(exportService.buildInventoryJson())
+              as Map<String, dynamic>;
+      final products = payload['products'] as List<dynamic>;
+      final categories = payload['categories'] as List<dynamic>;
+
+      expect(payload['app'], 'HogarStock');
+      expect(payload['version'], '1.1.0');
+      expect(products, hasLength(1));
+      expect(products.single['nombre'], 'Arroz');
+      expect(products.single['categoria'], 'Mercado');
+      expect(products.single['imagePath'], '/tmp/arroz.jpg');
+      expect(products.single['observaciones'], 'Bolsa sellada');
+      expect(categories, hasLength(1));
+    },
+  );
+
+  test('importa inventario desde JSON', () async {
+    final importService = ImportService(
+      productService: productService,
+      categoryService: categoryService,
+    );
+
+    final result = await importService.importInventoryJson('''
+{
+  "app": "HogarStock",
+  "version": "1.1.0",
+  "exportedAt": "2026-06-18T00:00:00",
+  "categories": [
+    {"id": "cat-mercado", "nombre": "Mercado"}
+  ],
+  "products": [
+    {
+      "id": "prod-arroz",
+      "nombre": "Arroz",
+      "categoriaId": "cat-mercado",
+      "categoria": "Mercado",
+      "cantidad": 3,
+      "unidadMedida": "paquetes",
+      "fechaVencimiento": "2026-07-01T00:00:00.000",
+      "cantidadMinima": 1,
+      "observaciones": "Bolsa sellada",
+      "imagePath": "/tmp/arroz.jpg"
+    }
+  ]
+}
+''');
+
+    final category = categoryService.findByName('Mercado');
+    final product = productService.getById('prod-arroz');
+
+    expect(result.categoriesImported, 1);
+    expect(result.productsImported, 1);
+    expect(category, isNotNull);
+    expect(product, isNotNull);
+    expect(product?.categoryId, category?.id);
+    expect(product?.quantity, 3);
+    expect(product?.unit, 'paquetes');
+    expect(product?.observations, 'Bolsa sellada');
+    expect(product?.imagePath, '/tmp/arroz.jpg');
+  });
 }
 
 Product _product({
@@ -151,6 +248,8 @@ Product _product({
   int quantity = 1,
   int minimumQuantity = 1,
   DateTime? expirationDate,
+  String? imagePath,
+  String? observations,
 }) {
   return Product(
     id: '',
@@ -162,5 +261,7 @@ Product _product({
     expirationDate: expirationDate,
     createdAt: DateTime(2026, 6, 5),
     updatedAt: DateTime(2026, 6, 5),
+    imagePath: imagePath,
+    observations: observations,
   );
 }

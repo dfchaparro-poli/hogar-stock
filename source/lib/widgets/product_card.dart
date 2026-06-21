@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../core/app_colors.dart';
 import '../models/category.dart';
 import '../models/product.dart';
+import 'product_image.dart';
 
 class ProductCard extends StatelessWidget {
   const ProductCard({
@@ -28,6 +29,14 @@ class ProductCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: ListTile(
         onTap: onTap,
+        leading: ProductImage(
+          imagePath: product.imagePath,
+          width: 48,
+          height: 48,
+          borderRadius: 6,
+          iconSize: 22,
+          enablePreview: false,
+        ),
         title: Text(product.name),
         subtitle: Text(
           '${category?.name ?? 'Sin categoria'} - Vence: $expirationText',

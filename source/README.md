@@ -1,17 +1,30 @@
-# hogar_stock
+# HogarStock
 
-A new Flutter project.
+Aplicacion movil multiplataforma en Flutter para gestionar inventario de
+productos del hogar. Funciona completamente offline y guarda la informacion de
+productos y categorias de forma local con Hive.
 
-## Getting Started
+No usa SQLite, backend, Firebase, autenticacion, APIs externas ni
+sincronizacion en la nube.
 
-This project is a starting point for a Flutter application.
+## Funcionalidades
 
-A few resources to get you started if this is your first Flutter project:
+- Registrar, consultar, editar y eliminar productos.
+- Buscar productos por nombre y filtrar por categoria.
+- Registrar fecha de vencimiento y consultar productos proximos a vencer.
+- Registrar cantidad minima y consultar productos por reponer.
+- Gestionar categorias.
+- Ver resumen del inventario.
+- Adjuntar imagenes a productos desde la galeria.
+- Exportar e importar el inventario completo en JSON desde el dispositivo.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Desarrollo
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter pub get
+flutter analyze
+flutter test
+flutter build apk
+```
+
+La version de entrega se define en `pubspec.yaml`.
