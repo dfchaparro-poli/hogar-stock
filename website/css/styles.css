@@ -441,16 +441,25 @@ h2 {
     min-height: auto;
   }
 
-  .phone-preview {
-    order: -1;
-  }
-
   .feature-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 560px) {
+  .hero-content {
+    text-align: center;
+  }
+
+  .hero-actions {
+    justify-content: center;
+  }
+
+  .download-meta {
+    width: 100%;
+    text-align: center;
+  }
+
   .carousel {
     grid-template-columns: 1fr;
   }
