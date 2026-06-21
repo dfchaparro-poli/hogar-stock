@@ -11,9 +11,7 @@ arquitectura sencilla y facil de explicar.
 
 ## Sitio Web
 
-<a href="https://dfchaparro-poli.github.io/hogar-stock/" target="_blank" rel="noopener noreferrer">
-  https://dfchaparro-poli.github.io/hogar-stock/
-</a>
+https://dfchaparro-poli.github.io/hogar-stock/
 
 ## Requisitos
 
